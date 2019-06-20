@@ -1,7 +1,7 @@
    const express= require('express');
    const router = express.Router();
-   const  Client = require('../conn');
-   const bycrypt = require('bcrypt');
+   const {Client} = require('pg')
+      const bycrypt = require('bcrypt');
 
    const client = new Client({
 
@@ -12,8 +12,10 @@
       database: "api"
         
       }); 
-   client.connect()
       
+  client.connect()
+  .then(()=> console.log('connected successfully'));
+  
    router.get('/login', (req, res)=>res.render('login'));
    // l
   /// register 
@@ -48,10 +50,8 @@ errors.push({msg: 'password length should be atleast six charcter long'})
          password2   
         });
      }else{
-      client.connect()
-   client.query("SELECT * FROM users WHERE email = $1", [email])
+    client.query("SELECT * FROM users where email=$1 and name = $2",[email, name] )
    .then(results => {
-   //  console.log(results.rows()); 
  if(results){
           //User exist
    errors.push({msg:'user already exist'})
@@ -62,8 +62,11 @@ errors.push({msg: 'password length should be atleast six charcter long'})
       password,
       password2
    })
+  }  else{
    console.log(results.rows)
-  }  
+   res.send('hello')
+
+  }
 
    })
    // console.log(req.body);
