@@ -51,7 +51,7 @@ errors.push({msg: 'password length should be atleast six charcter long'})
       client.connect()
    client.query("SELECT * FROM users WHERE email = $1", [email])
    .then(results => {
-      console.log(results.rows()); 
+   //  console.log(results.rows()); 
  if(results){
           //User exist
    errors.push({msg:'user already exist'})
@@ -62,12 +62,13 @@ errors.push({msg: 'password length should be atleast six charcter long'})
       password,
       password2
    })
+   console.log(results.rows)
   }  
 
    })
-   console.log(req.body);
-   //res.redirect('../login');
-   res.send('hello');
+   // console.log(req.body);
+   // //res.redirect('../login');
+   // res.send('hello');
      
 }
      
