@@ -13,7 +13,7 @@ const  connectionString ={
 
    const register = (req, res) => {
    const client = new Client(connectionString);
-      client.connect();
+      client.connect();         
       const {
           name,
           email, 
@@ -70,6 +70,7 @@ const  connectionString ={
       })
    }
    })
+
 }
  
  
