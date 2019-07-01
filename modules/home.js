@@ -16,26 +16,23 @@ const  connectionString ={
     port: 5432,
     database: "api"
  }
- 
-    
-    const client = new Client(connectionString);
+  
+
+   const client = new Client(connectionString);
        client.connect();         
+
  
-     const data = {
-          values:[email]
-     }
-    
- 
- const queryResult = client.query('SELECT * FROM users WHERE email = $1',(err, result)=>{
-    if(result.rowCount !== 0){
+ const queryResult = client.query('SELECT * FROM users WHERE email = $1',[email]).then(result => {
+    if(result.rowCount){
        return res.status(409).json({
           status:'error',
            code: 409,
            message:'Account already in use'
-       });
-    
+       });d
+    }else{
+      return res.json({msg:'create account'})
     }
-    });
+    }).catch(err=>console.log(err))
  
      
   })

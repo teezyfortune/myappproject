@@ -1,13 +1,12 @@
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts')
-const  Client = require('./conn');
 //const routes = require('./routes/User')
 
  const app = express();
  
     
 
-   // engine
+   //  EJS  engine
  app.set('view engine', 'ejs');
  app.use(expressLayouts);
  
@@ -16,8 +15,8 @@ const  Client = require('./conn');
  app.use(express.urlencoded({extended: false}))
 
    //Routes
-    app.use('/users', require('./routes/home'))
-   // app.use('./register', require('./routes/User'))
+    app.use('/users', require('./modules/home'))
+   app.use('/User', require('./modules/User'))
 
      const PORT = process.env.PORT|| 5005;
 
