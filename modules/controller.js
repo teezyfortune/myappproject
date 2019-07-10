@@ -1,14 +1,17 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const conn = require('../conn')
+require('../config/passport');
+const passport= require('passport')
+
+
 //const  helper =require('../modules/helper')
    
    const register = (req, res) => {
       const{name, email, password, password2}=req.body
-      let errors = [];
-      const validate = () => {
+      const errors = [];
          //  check require fields
-         if(!name||!email||!password||!password){
+         if(!name||!email||!password||!password2){
           errors.push({msg:'all fields required'});
          }
          //password match
@@ -19,7 +22,7 @@ const conn = require('../conn')
          if(password < 6){
           errors.push({msg:'password must be aleast six charcters'})
          }
-              }
+              
     if(errors.length > 0){
        res.render('register',{
       errors,
@@ -48,7 +51,7 @@ const conn = require('../conn')
       }).catch(err=>console.log(err.stack))
 //res.status(200).json({msg:`welcome ${name}`}); 
           bcrypt.hash(password, 10)
-            .then( hash=>{
+             .then( hash=>{
          const CreateUser = {
             name:'User',
             text: 'INSERT INTO users(name,email,password, created_at) VALUES($1,$2,$3,$4)',
@@ -65,39 +68,49 @@ const conn = require('../conn')
             //       email:user.email,
             //       created:new Date
             //       })
+           // req.push('you are now registered')
             res.redirect('/User/login')
          }).catch(err=> console.log(err.stack))
 
           }).catch(err => console.log(err.stack))
    }
-}
- 
-   const login = (req, res)=>{
-      const {email, password}=req.body
-      let errors = []
-      if(!email || !password){
-         errors.push({msg:'your input are not correct, enter correct details'})
-      }
-      const isExistEmail = {
-         name: 'checkExist',
-        text: 'SELECT * FROM users WHERE  email = $1',
-         values: [email],
-      }
-      conn.query(isExistEmail).then(userExist =>{
-         if(userExist){
-          console.log('>>>>>>',userExist.password)
-         bcrypt.compare(password, userExist.password).then(isMatch =>{ 
-            if(isMatch){
-               res.status(201).json({msg:`you logged in as ${email}`})
-            }else{
-               errors.push({msg:'user name and password incorect'})
-            }
-
-         }).catch(err=>console.log(err))
-         }
-      }).catch(err=>console.log(err))
    }
+ 
+   const login = (req, res, next)=>{
+      passport.authenticate('local',{
+         successRedirect:'/dashboard',
+         failureRedirect: '/User/login',
+         failureFlash:true
+      })(req, res, next);
+ 
+      //    let errors = []
+   //    let succes_msg =[]
+
+   //    const email = req.body.email;
+   //    const password = req.body.password;
+   //  const conFirmEmail = {
+   //       name:'sql',
+   //       text: 'SELECT * FROM users WHERE email=$1',
+   //       values: [email]
+   //  }
+   // conn.query(conFirmEmail).then(isMail=>{
+   // //    const {rows}=isMail
+   //    if(!isMail){
+   //         res.status(404).json({msg:'email is incorrect'})
+   //    }
+         // bcrypt.compare(password,rows[0].password).then(isPassword=>{
+         //    console.log(rows[0].password)
+         //    if(isPassword){
+         //       res.status(200).json({msg:`you logged in as ${email}`})
+         //    }else{
+         //       res.json({msg:`password not correct`})
+         //    }
+         // }).catch(err=>console.log(err))
+      
+   // }).catch(err=> console.log(err))
+   }
+
 module.exports = {
    register,
-   login
+   login 
 }
