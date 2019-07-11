@@ -5,6 +5,7 @@ const expressLayouts = require('express-ejs-layouts')
 const session = require('express-session');
 const passport= require('passport')
   //const Users = require('../api/Routes')
+  const flash= require('connect-flash');
 
  const app = express();
     
@@ -25,16 +26,16 @@ const passport= require('passport')
       saveUninitialized:true,
       cookie: {secure: true}
     }))
- //  app.use(flash())
-   // passport middleware
+  app.use(flash())
+  //passport middleware
    app.use(passport.initialize());
     app.use(passport.session());
-   //      global vars
-  //   app.use((req, res, next)=>{
-  //   res.locals.success_msg = req.flash('success_msg')
-  //   res.locals.err_msg = req.flash('err_msg')
-  //    next();
-  // })
+       // global vars
+    app.use((req, res, next)=>{
+    res.locals.success_msg = req.flash('success_msg')
+    res.locals.err_msg = req.flash('err_msg')
+     next();
+  })
 
    //Routes
     app.use('/users', require('./modules/home'))
