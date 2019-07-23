@@ -8,7 +8,7 @@ const  connectionString ={
     password: "password",
     host:"localhost",
     port: 5432,
-    database: "api"
+    database: "meetup"
  }  
 
  const client = new Client(connectionString);
