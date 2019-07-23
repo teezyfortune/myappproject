@@ -12,7 +12,7 @@ export default class UserController{
 			password,
 			username } = req.body;
 		const sql={
-			name:'checkEmail',git 
+			name:'checkEmail',
 			text:'SELECT * FROM users WHERE email = $1',
 			values:[email]
 		};
@@ -32,7 +32,7 @@ export default class UserController{
 							hash, 
 							username, 
 							new Date(),
-							true
+							false
 						];
 						conn.query(query,values)
 							.then(user=>{
@@ -40,7 +40,7 @@ export default class UserController{
 								jwt.sign({id}, 'westkainda', {expiresIn:'420s'}, (err, token)=>{
 									res.status(201).json({
 										status:201,
-										token:token,
+										token,
 										data:user.rows[0]
 									});
 								});

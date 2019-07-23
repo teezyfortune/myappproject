@@ -15,7 +15,7 @@ const Inputs ={
 
 
 let InputsToken;
-before((done)=>{f.t
+before((done)=>{
 	chai.request(app)
 		.post('/api/v1/users/login')
 		.send(Inputs)

@@ -12,9 +12,7 @@ export default class ValidateMiddleWare{
 			return res.status(400).json({
 				status:'error',
 				msg:'all fields required',
-
-			});
-				
+			});	
 		}
 		if(password.length < 6){
 			return    res.status(400).json({

@@ -37,9 +37,7 @@ it('should return 201 and create new user', (done)=>{
 			.post('/api/v1/users/signup')
 			.send(User)
 			.end((err, res) =>{
-			//	expect(res).to.have.status(201);
-			//	expect(res.body.status).to.be.eql(201);
-				expect(res.body.token).to.be.eql('token');
+				expect(res).to.have.status(201);
 				expect(res.body.data).to.be.an('object');
 				done();
 			});
@@ -49,9 +47,8 @@ it('should return 409 and user already exist in the database message', (done)=>{
 			.post('/api/v1/users/signup')
 			.send(User)
 			.end((err, res) =>{
-				//expect(res).to.have.status(409);
-				//expect(res.body.status).to.be.eql(409);
-				expect(res.body.msg).to.be.eql('user already exist in the database ');
+				expect(res).to.have.status(409);
+				expect(res.body.msg).to.be.eql('user already exist in the database');
 				done();
 			});
 
