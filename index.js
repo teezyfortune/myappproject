@@ -2,8 +2,8 @@ import express from 'express';
 import { join } from 'path';
 import jwt from 'jsonwebtoken';
 import bodyParser from 'body-parser';
-import Routes from './server/apiEndpoint@/modules/Routes';
-import routes from './server/apiEndpoint/routes';       
+import Routes from './server/apiUsingDbase/modules/Routes';
+import routes from './server/dummyData/routes';       
                                                                             
 const app = express();
 // body parser
