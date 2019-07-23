@@ -1,11 +1,8 @@
-const express = require('express');
-const bcrypt = require('bcrypt');
+import express  from 'express';
+import bcrypt from 'bcrypt';
 
-const comparePassword = (password) =>{
-     bcrypt.compare(password, hash).then(res =>res == true
-     )}
- 
-module.exports={
-  //  validate
+export default class helper {
+	static comparePassword (password) {
+		bcrypt.compare(password, hash).then(res =>res == true );
+	}
 }
-    

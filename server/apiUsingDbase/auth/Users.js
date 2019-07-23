@@ -12,7 +12,7 @@ export default class UserController{
 			password,
 			username } = req.body;
 		const sql={
-			name:'checkEmail',
+			name:'checkEmail',git 
 			text:'SELECT * FROM users WHERE email = $1',
 			values:[email]
 		};
