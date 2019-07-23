@@ -6,22 +6,15 @@ export default class ValidateMiddleWare{
 		const {
 			email,
 			password,
-			confirmPass,
 			username
 		}  = req.body;
-		if(!email||!password||!confirmPass||!username){
+		if(!email||!password||!username){
 			return res.status(400).json({
 				status:'error',
 				msg:'all fields required',
 
 			});
-		}
-		if(password !== confirmPass){
-			return  res.statu(400).json({
-				status:'error',
-				msg:'password not match',
-
-			});
+				
 		}
 		if(password.length < 6){
 			return    res.status(400).json({

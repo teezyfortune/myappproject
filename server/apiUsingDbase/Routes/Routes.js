@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import  UserController from '../auth/Users';
 import ValidateMiddleware  from '../middleware';
-import meetUpController from '../../../server/apiEndpoint@/modules/meetup';
+import meetUpController from '../../../server/apiUsingDbase/modules/meetup';
 const router = Router();
 router.post('/signup', ValidateMiddleware.validatesignUp, UserController.signUp);
 router.post('/login', ValidateMiddleware.validateSignIn, ValidateMiddleware.VerifyToken, UserController.login);

@@ -15,7 +15,7 @@ const Inputs ={
 
 
 let InputsToken;
-before((done)=>{
+before((done)=>{f.t
 	chai.request(app)
 		.post('/api/v1/users/login')
 		.send(Inputs)
@@ -33,22 +33,8 @@ it('should return 400 if all inputs are empty', (done) => {
 			.send({
 				email:'',
 				password:'',
-				confirmPass:'',
-				username:''			})
-			.end((err, res)=>{
-				expect(res).to.have.status(400);
-				expect(res.body.status).to.be.eql('error');
-				done();
-			});
-	});
-
-it('should return 400 if confirmPass does not match password', (done) => {
-		chai.request(app)
-			.post('/api/v1/users/signup')
-			.send({
-				password:'Admin123',
-				confirmPass:'Admin',
-})
+				username:''			
+			})
 			.end((err, res)=>{
 				expect(res).to.have.status(400);
 				expect(res.body.status).to.be.eql('error');
