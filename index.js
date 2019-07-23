@@ -2,7 +2,7 @@ import express from 'express';
 import { join } from 'path';
 import jwt from 'jsonwebtoken';
 import bodyParser from 'body-parser';
-import Routes from './server/apiUsingDbase/modules/Routes';
+import Routes from './server/apiUsingDbase/Routes/Routes';
 import routes from './server/dummyData/routes';       
                                                                             
 const app = express();
