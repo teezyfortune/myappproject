@@ -1,7 +1,7 @@
 import { Client } from 'pg';
-import process from 'dotenv';
+import dotenv from 'dotenv';
 
-process.config();
+dotenv.config();
 const connectionString = {
 	host: process.env.DB_HOST,
 	user: process.env.DB_USER,
