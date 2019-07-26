@@ -1,14 +1,11 @@
-const express= require('express');
-const path = require('path');
-const bcrypt= require('bcrypt')
+import bcrypt from 'bcrypt';
 
-const verifyPassword =(password, hashPassword)=>{
-return bcrypt.compareSync(password, hashPassword);
-}
+export default class helper {
+	static encCryptPassword(password) {
+		return 	bcrypt.hashSync(password, 10);
+	}
 
-
-
-
-module.exports={
-    verifyPassword
+	static verifyPassword(password, hashPassword) {
+		return bcrypt.compareSync(password, hashPassword);
+	}
 }

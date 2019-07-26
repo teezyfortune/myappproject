@@ -1,0 +1,29 @@
+
+{
+"env":{
+"es6":true,
+"node":true,
+"mocha":true,
+},
+
+	"extends":"airbnb",
+
+ "rules":{
+	 "no-console":0,
+	 "comma-dangle":0,
+	 "no-restricted-globals":0,
+     "import/extensions":0,
+     "import/order":0,
+	 "max-len":0,
+	 "no-undef":0,
+	 "no-unused-vars":"warn",
+	 "array-callback-return":0,
+		"indent":["error", "tab"],
+        "func-names":"off",
+        "no-tabs":0
+},
+	"parserOptions":{
+		"ecmaVersion":6
+
+	},
+}

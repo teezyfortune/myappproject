@@ -9,9 +9,9 @@ chai.expect();
 
 
 const User = {
-	email:'user@gmail.com',
+	email:'usser@gmail.com',
 	password:'new123',
-	username:'AdminUser'
+	username:'AdminUser1'
 };
 
 const UserMain ={
@@ -29,7 +29,6 @@ before((done)=>{
 			done();
 		}); 
 });
-
 
 describe('POST  /signup', ()=>{
 it('should return 201 and create new user', (done)=>{

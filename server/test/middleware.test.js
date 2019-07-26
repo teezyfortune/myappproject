@@ -9,27 +9,27 @@ chai.expect();
 
 
 const Inputs ={
-	email:'example@gmail.com',
-	password:'Admin123',
+  email:'example@gmail.com',
+  password:'Admin123',
 };
 
 
 let InputsToken;
 before((done)=>{
 	chai.request(app)
-		.post('/api/v1/users/login')
-		.send(Inputs)
-		.end((req, res )=>{
-			InputsToken = res.body.token;
-			done();
+    .post('/api/v1/users/login')
+    .send(Inputs)
+    .end((req, res )=>{
+	InputsToken = res.body.token;
+	done();
 		});
 
 })
 
 describe('POST validates SignUp', () => {
 it('should return 400 if all inputs are empty', (done) => {
-		chai.request(app)
-			.post('/api/v1/users/signup')
+
+	chai.request(app).post('/api/v1/users/signup')
 			.send({
 				email:'',
 				password:'',
