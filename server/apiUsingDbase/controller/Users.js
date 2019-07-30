@@ -1,6 +1,9 @@
 import jwt from 'jsonwebtoken';
 import helper from '../helper';
 import conn from '../../config';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 //  sign up handle
 export default class UserController {
@@ -13,7 +16,7 @@ export default class UserController {
 		const sql = {
 			name: 'checkEmail',
 			text: 'SELECT * FROM users WHERE email = $1',
-			values: [emai]
+			values: [email]
 		};
 		conn.query(sql).then((result) => {
 			if (result.rowCount !== 0) {
@@ -29,12 +32,12 @@ export default class UserController {
 				hash,
 				username,
 				new Date(),
-				false
+				true
 			];
 			conn.query(query, values)
 				.then((user) => {
-					const { id } = user.rows;
-					jwt.sign({ id }, 'westkainda', { expiresIn: '420s' }, (err, token) => {
+					const { id } = user.rows.rows;
+					jwt.sign({ id }, process.env.SECRET_KEY, { expiresIn: '420s' }, (err, token) => {
 						res.status(201).json({
 							status: 201,
 							token,
@@ -44,7 +47,6 @@ export default class UserController {
 				}).catch((err) => {
 					console.log(err);
 				});
-			console.log(err);
 		}).catch((err) => {
 			console.log(err);
 		});
@@ -57,19 +59,19 @@ export default class UserController {
 		const values = [email];
 		conn.query(sqlText, values).then((user) => {
 			if (!user.rowCount) {
-				res.json({ msg: 'no user with this email' });
+				res.status(400).json({ msg: 'no user with this email' });
 			}
 			if (!helper.verifyPassword(password, user.rows[0].password)) {
 				res.json({ msg: 'in valid password' });
 			}
-			//	const { id } = user.rows;
-			jwt.verify(req.token, 'westkainda', (err, authData) => {
-				if (err) throw err;
+			const { id } = user.rows[0];
+			jwt.sign({ id }, process.env.SECRET_KEY, { expiresIn: '2hrs' }, (err, token) => {
 				res.status(200).json({
 					status: 200,
-					message: `you are logged in as ${user.rows[0].email} `(),
-					token: authData,
-					data: user.rows
+					message: `you are logged in as ${user.rows[0].email} `,
+					token,
+					email: user.rows[0].email,
+					username: user.rows[0].username
 				});
 			});
 		});

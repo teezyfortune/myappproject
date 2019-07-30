@@ -1,7 +1,8 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import app from '../../index';
-const {expect} = chai;
+
+const { expect } = chai;
 
 chai.use(chaiHttp);
 chai.should();
@@ -9,81 +10,88 @@ chai.expect();
 
 
 const Inputs ={
-  email:'example@gmail.com',
-  password:'Admin123',
+	email: 'example@gmail.com',
+	password: 'Admin123',
 };
 
-
 let InputsToken;
-before((done)=>{
+before((done) => {
 	chai.request(app)
-    .post('/api/v1/users/login')
-    .send(Inputs)
-    .end((req, res )=>{
-	InputsToken = res.body.token;
-	done();
+		.post('/api/v1/users/login')
+		.send(Inputs)
+		.end((req, res) => {
+			InputsToken = res.body.token;
+			done();
 		});
+});
 
-})
+const info = null;
+after((done) => {
+	chai.request(app)
+		.post('/api/v1/users/login')
+		.send(info)
+		.end((req, res) => {
+			InputsToken = res.body.token;
+			done();
+		});
+});
 
 describe('POST validates SignUp', () => {
-it('should return 400 if all inputs are empty', (done) => {
-
-	chai.request(app).post('/api/v1/users/signup')
+	it('should return 400 if all inputs are empty', (done) => {
+		chai.request(app).post('/api/v1/users/signup')
 			.send({
-				email:'',
-				password:'',
-				username:''			
+				email: '',
+				password: '',
+				username: ''
 			})
-			.end((err, res)=>{
+			.end((err, res) => {
 				expect(res).to.have.status(400);
 				expect(res.body.status).to.be.eql('error');
 				done();
 			});
 	});
-it('should return 400 if password less than six characters', (done) => {
+	it('should return 400 if password less than six characters', (done) => {
 		chai.request(app)
 			.post('/api/v1/users/signup')
 			.send({
-				email:'example@gmail.com',
-				password:'Admin',
-				confirmPass:'Admin',
-				username:'admin@meetup'
+				email: 'example@gmail.com',
+				password: 'Admin',
+				confirmPass: 'Admin',
+				username: 'admin@meetup'
 			})
-			.end((err, res)=>{
+			.end((err, res)=> {
 				expect(res).to.have.status(400);
 				expect(res.body.status).to.be.eql('error');
 				expect(res.body.msg).to.be.eql('password length too short');
 				done();
 			});
 	});
-
 });
 
-const signInputs ={
-	email:'example@gmail.com',
-	password:'Admin123'
-}
+const signInputs = {
+	email: 'example@gmail.com',
+	password: 'Admin123'
+};
 
 let Token;
-before((done)=>{
+before((done) => {
 	chai.request(app)
 		.post('/api/v1/users/login')
 		.send(signInputs)
-		.end((req, res )=>{
+		.end((req, res) => {
 			Token = res.body.token;
 			done();
 		});
-	})
+})
 describe('POST /validates login', () => {
 	it('should return 400 if email and password are empty', (done) => {
 		chai.request(app)
 			.post('/api/v1/users/login')
 			.send({
-				email:'',
-				password:'',
+				email: '',
+				password: '',
 			})
-			.end((err, res)=>{
+			.end((err, res) => {
 				expect(res).to.have.status(400);
 				expect(res.body.status).to.be.eql('error');
 				expect(res.body.msg).to.be.eql('email and password required');

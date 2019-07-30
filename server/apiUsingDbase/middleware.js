@@ -1,3 +1,7 @@
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export default class ValidateMiddleWare {
 	static validatesignUp(req, res, next) {
@@ -40,14 +44,21 @@ export default class ValidateMiddleWare {
 	static VerifyToken(req, res, next) {
 		const bearerHeader = req.headers.authorization;
 		// Bearer is not undefined
-		if (typeof bearerHeader !== 'undefined') {
-			const Bearer = bearerHeader.split(' ');
-			const bearerToken = Bearer[1];
-			req.token = bearerToken;
-			next();
-		} else {
-			res.sendStatus(403);
-		}
+		const Bearer = bearerHeader.split(' ');
+		const bearerToken = Bearer[1];
+		req.token = bearerToken;
+		jwt.verify(req.token, process.env.SECRET_KEY, (err, decoded) => {
+			if (err) {
+				res.status(401).json({
+					code: 401,
+					messgae: 'u are not loggedIn'
+				});
+			}
+			req.userId = decoded.id;
+            console.log('>>>>>>>', decoded.id);
+            console.log('>>>>>>', new Date())
+			return next();
+		});
 	}
 
 	// validates meetup
@@ -65,5 +76,17 @@ export default class ValidateMiddleWare {
 			res.json({ msg: 'all fields required' });
 		}
 		return next();
+	}
+
+	static validatQuestion(req, res) {
+		const {
+			meetup,
+			title,
+			body
+		} = req.body;
+
+		if (!meetup || !title || !body) {
+			res.json({ msg: 'all fields require' });
+		}
 	}
 }

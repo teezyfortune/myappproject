@@ -13,7 +13,7 @@ app.use('/api/v1/users', Routes);
 
 //  app.use(static(join(__dirname, 'public')))
 
-const PORT = process.env.PORT || 5005;
+const port = process.env.PORT || developement;
 
-app.listen(PORT, () => console.log(`server running on ${PORT}`));
+app.listen(port, () => console.log(`server running on ${port}`));
 export default app;
