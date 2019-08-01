@@ -55,8 +55,8 @@ export default class ValidateMiddleWare {
 				});
 			}
 			req.userId = decoded.id;
-            console.log('>>>>>>>', decoded.id);
-            console.log('>>>>>>', new Date())
+			console.log('>>>>>>>', decoded.id);
+			console.log('>>>>>>', new Date());
 			return next();
 		});
 	}
@@ -70,23 +70,23 @@ export default class ValidateMiddleWare {
 			tags,
 		} = req.body;
 		if (!location
-       || !images
-       || !topic
-       || !tags) {
+		|| !images
+		|| !topic
+		|| !tags) {
 			res.json({ msg: 'all fields required' });
 		}
 		return next();
 	}
 
-	static validatQuestion(req, res) {
+	static validatQuestion(req, res, next) {
 		const {
-			meetup,
 			title,
 			body
 		} = req.body;
 
-		if (!meetup || !title || !body) {
-			res.json({ msg: 'all fields require' });
+		if (!title || !body) {
+			res.json({ msg: 'all fields required' });
 		}
+		return next();
 	}
 }

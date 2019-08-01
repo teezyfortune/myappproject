@@ -6,10 +6,26 @@ export default class QuestionController {
 			title,
 			body
 		} = req.body;
-		const { userId, meetupId } = req;
+		const { userId } = req;
+		const meetupId = parseInt(req.params.id, 10);
+		console.log(meetupId);
+		console.log(userId);
+
+		const checkId = {
+			text: 'SELECT * FROM meetup WHERE  id =$1',
+			values: [meetupId]
+		};
+		conn.query(checkId).then((meetup) => {
+			if (meetup.rowCount === 0) {
+				res.status(404).json({
+					status: 404,
+					message: 'this meetup has been deleted or removed by the moderator',
+				});
+			}
+		});
 		const checkExist = {
-			text: 'SELECT * FROM question  WHERE title = $1 and body =$2',
-			values: [title]
+			text: 'SELECT * FROM question  WHERE  title = $1 AND body =$2 ',
+			values: [title, body]
 		};
 		conn.query(checkExist).then((asked) => {
 			if (asked.rowCount !== 0) {
@@ -20,19 +36,17 @@ export default class QuestionController {
 			}
 		});
 
-		const query = 'INSERT INTO question(userid, meetupId, createdon, title, body) VALUES(1$,$2,$3,$4,$5) RETURNING *';
-		const values = [userId, meetupId, new Date(), title.trim().toLowerCase(), body.trim().toLowerCase()];
-		conn.query(query, values).then((newQuestion) => {
-			client.end();
+		const query = `INSERT INTO question (userid, meetupid, title, body) VALUES('${userId}','${meetupId}','${title}','${body}') RETURNING *`;
+		conn.query(query).then((newQuestion) => {
 			res.status(201).json({
 				status: 201,
 				question: {
-					id: newQustion.rows.id,
-					userId: newQustion.rows.userId,
-					meetupId: newQustion.rows.meetupId,
-					createdon: newQuestion.rows.createdon,
-					title: newQustion.rows.title,
-					body: newQustion.rows.body
+					id: newQuestion.rows[0].id,
+					userId: newQuestion.rows[0].userId,
+					meetupId: newQuestion.rows[0].meetupId,
+					createdon: newQuestion.rows[0].createdon,
+					title: newQuestion.rows[0].title,
+					body: newQuestion.rows[0].body
 				}
 			});
 		});

@@ -20,7 +20,8 @@
 	 "array-callback-return":0,
 		"indent":["error", "tab"],
         "func-names":"off",
-        "no-tabs":0
+        "no-tabs":0,
+        "prefer-destructuring":0,
 },
 	"parserOptions":{
 		"ecmaVersion":6
