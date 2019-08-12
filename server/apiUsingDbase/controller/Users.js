@@ -11,35 +11,33 @@ export default class UserController {
 		const {
 			email,
 			password,
-			username
 		} = req.body;
 		const sql = {
 			name: 'checkEmail',
-			text: 'SELECT * FROM users WHERE email = $1',
+			text: 'SELECT * FROM users WHERE email = $1 LIMIT 1',
 			values: [email]
 		};
 		conn.query(sql).then((result) => {
 			if (result.rowCount !== 0) {
-				res.status(409).json({
+				return res.status(409).json({
 					status: 409,
 					msg: 'user already exist in the database'
 				});
 			}
 			const hash = helper.encCryptPassword(password);
-			const query = 'INSERT INTO users(email,password,username, registered, isAdmin) VALUES ($1,$2,$3,$4,$5) RETURNING  email, username,registered,isAdmin';
+			const query = 'INSERT INTO users(email,password,isAdmin) VALUES ($1,$2,$3) RETURNING  email, registered,isAdmin';
 			const values = [
 				email,
 				hash,
-				username,
-				new Date(),
-				true
+				false
 			];
 			conn.query(query, values)
 				.then((user) => {
-					const { id } = user.rows.rows;
+					const { id } = user.rows[0];
 					jwt.sign({ id }, process.env.SECRET_KEY, { expiresIn: '420s' }, (err, token) => {
 						res.status(201).json({
 							status: 201,
+							message: 'success',
 							token,
 							data: user.rows[0]
 						});
@@ -51,11 +49,11 @@ export default class UserController {
 			console.log(err);
 		});
 	}
-
 	//	login handle
+
 	static login(req, res) {
 		const { email, password } = req.body;
-		const sqlText = 'SELECT * FROM users WHERE email =$1';
+		const sqlText = 'SELECT * FROM users WHERE email =$1 LIMIT 1';
 		const values = [email];
 		conn.query(sqlText, values).then((user) => {
 			if (!user.rowCount) {
@@ -75,5 +73,80 @@ export default class UserController {
 				});
 			});
 		});
+	}
+
+	static Userprofile(req, res) {
+		const { userId } = req;
+		const checkMatch = {
+			text: 'SELECT * FROM users WHERE id = $1',
+			value: [userId]
+		};
+		conn.query(checkMatch, (err, proFiileInfo) => {
+			if (err) {
+				res.status(400).json({
+					status: 400,
+					message: 'Oops! somethiong went wrong'
+				});
+			} else {
+				res.status(200).json({
+					status: 200,
+					proFiile: {
+						firstname: proFiileInfo.rows[0].firstname,
+						lastname: proFiileInfo.rows[0].lastname,
+						othername: proFiileInfo.rows[0].othername,
+						email: proFiileInfo.rows[0].email,
+						phonenumber: proFiileInfo.rows[0].phonenumber
+					}
+				});
+			}
+		});
+	}
+
+	static UpdateProfile(req, res, next) {
+		const { userId } = req;
+		const checkExist = {
+			text: ' SELECT * FROM users WHERE id =$1',
+			values: [userId],
+		};
+		conn.query(checkExist, (err, exist) => {
+			if (exist.rowCount === 0) {
+				res.status(404).json({
+					status: 404,
+					message: `no user withe id: ${userId}`
+				});
+			}
+		});
+		const {
+			firstname,
+			lastname,
+			othername,
+			phonenumber,
+			username
+		} = req.body;
+		const UpdateSql = {
+			name: 'profileUpdate',
+			text: 'UPDATE users SET firstname = $1, lastname = $2, othername =$3, phonenumber=$4  WHERE id =$5 RETURNING *',
+			values: [firstname.trim().toLowerCase(), lastname.trim().toLowerCase(), othername.trim().toLowerCase(), phonenumber.trim().toLowerCase(), username.trim().toLowerCase(), userId]
+		};
+		conn.query(UpdateSql, (err, Updatedprofile) => {
+			if (err) {
+				res.status(400).json({
+					status: 400,
+					message: 'Oops! something went wrong'
+				});
+			} else {
+				res.status(200).json({
+					status: 200,
+					proFileInfo: {
+						firstname: Updatedprofile.rows[0].firstname,
+						lastname: Updatedprofile.rows[0].lastname,
+						othername: Updatedprofile.rows[0].othername,
+						email: Updatedprofile.rows[0].email,
+						phonenumber: Updatedprofile.rows[0].phonenumb
+					}
+				});
+			}
+		});
+		return next();
 	}
 }

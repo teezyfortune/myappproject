@@ -9,44 +9,87 @@ chai.should();
 chai.expect();
 
 
-const Inputs ={
-	email: 'example@gmail.com',
+const Inputs = {
+	email: 'Admin@gmail.com',
 	password: 'Admin123',
 };
+let UserToken;
 
-let InputsToken;
 before((done) => {
 	chai.request(app)
 		.post('/api/v1/users/login')
 		.send(Inputs)
-		.end((req, res) => {
-			InputsToken = res.body.token;
-			done();
-		});
-});
-
-const info = null;
-after((done) => {
-	chai.request(app)
-		.post('/api/v1/users/login')
-		.send(info)
-		.end((req, res) => {
-			InputsToken = res.body.token;
+		.end((err, res) => {
+			UserToken = res.body.token;
 			done();
 		});
 });
 
 describe('POST validates SignUp', () => {
 	it('should return 400 if all inputs are empty', (done) => {
-		chai.request(app).post('/api/v1/users/signup')
+		chai.request(app)
+			.post('/api/v1/users/signup')
 			.send({
 				email: '',
 				password: '',
-				username: ''
 			})
 			.end((err, res) => {
 				expect(res).to.have.status(400);
 				expect(res.body.status).to.be.eql('error');
+				done();
+			});
+	});
+	it('should return 400 if email is not a string', (done) => {
+		chai.request(app)
+			.post('/api/v1/users/signup')
+			.send({
+				email: true,
+				password: 'Admin123',
+			})
+			.end((err, res) => {
+				expect(res).to.have.status(400);
+				expect(res.body.status).to.be.eql('error');
+				done();
+			});
+	});
+
+	it('should return 400 if email is not valid', (done) => {
+		chai.request(app).post('/api/v1/users/signup')
+			.send({
+				email: 'examplegmail.com',
+				password: 'Admin123',
+			})
+			.end((err, res) => {
+				expect(res).to.have.status(400);
+				expect(res.body.status).to.be.eql(400);
+				done();
+			});
+	});
+	it('should return 400 if password is not a string', (done) => {
+		chai.request(app)
+			.post('/api/v1/users/signup')
+			.send({
+				email: 'example@gmail.com',
+				password: true,
+			})
+			.end((err, res) => {
+				expect(res).to.have.status(400);
+				expect(res.body.status).to.be.eql('error');
+				expect(res.body.msg).to.be.eql('password must be a string');
+				done();
+			});
+	});
+	it('should return 400 if password contain space', (done) => {
+		chai.request(app)
+			.post('/api/v1/users/signup')
+			.send({
+				email: 'example@gmail.com',
+				password: ' ',
+			})
+			.end((err, res) => {
+				expect(res).to.have.status(400);
+				expect(res.body.status).to.be.eql('error');
+				expect(res.body.msg).to.be.eql('password should not have a space');
 				done();
 			});
 	});
@@ -56,10 +99,8 @@ describe('POST validates SignUp', () => {
 			.send({
 				email: 'example@gmail.com',
 				password: 'Admin',
-				confirmPass: 'Admin',
-				username: 'admin@meetup'
 			})
-			.end((err, res)=> {
+			.end((err, res) => {
 				expect(res).to.have.status(400);
 				expect(res.body.status).to.be.eql('error');
 				expect(res.body.msg).to.be.eql('password length too short');
@@ -68,34 +109,110 @@ describe('POST validates SignUp', () => {
 	});
 });
 
-const signInputs = {
-	email: 'example@gmail.com',
-	password: 'Admin123'
-};
-
-let Token;
-before((done) => {
-	chai.request(app)
-		.post('/api/v1/users/login')
-		.send(signInputs)
-		.end((req, res) => {
-			Token = res.body.token;
-			done();
-		});
-})
-describe('POST /validates login', () => {
-	it('should return 400 if email and password are empty', (done) => {
+describe('Meetup validation ', () => {
+	it('should return 400 if all input are empty', (done) => {
 		chai.request(app)
-			.post('/api/v1/users/login')
+			.post('/api/v1/users/meetup')
+			.set('Authorization', `Bearer ${UserToken}`)
 			.send({
-				email: '',
-				password: '',
+				location: '',
+				images: '',
+				topic: '',
+				tags: '',
+				happeningon: ''
 			})
 			.end((err, res) => {
 				expect(res).to.have.status(400);
 				expect(res.body.status).to.be.eql('error');
-				expect(res.body.msg).to.be.eql('email and password required');
+				done();
+			});
+	});
 
+	it('should should check if all inputs are string', (done) => {
+		chai.request(app)
+			.post('/api/v1/users/meetup')
+			.set('Authorization', `Bearer ${UserToken}`)
+			.send({
+				location: true,
+				image: '/images/test.jpeg',
+				topic: 'WHY JS',
+				tags: 'Web Dev',
+				happeningon: ''
+			})
+			.end((err, res) => {
+				expect(res).to.have.status(400);
+				expect(res.body.status).to.be.eql('error');
+				done();
+
+			});
+	});
+});
+describe('question validation', () => {
+	it('should check if all fields are entered', (done) => {
+		chai.request(app)
+			.post('/api/v1/users/meetup/:id/question')
+			.set('Authorizationj', `Bearer ${UserToken}`)
+			.send({
+				title: 'web',
+				body: ''
+			})
+			.end((err, res) => {
+				expect(res).to.have.status(400);
+				expect(res.status).to.be.eql(400);
+				done();
+
+			});
+	});
+	it('should check if all fields are string', (done) => {
+		chai.request(app)
+			.post('/api/v1/users/meetup/:id/question')
+			.set('Authorization', `Bearer ${UserToken}`)
+			.send({
+				title: true,
+				body: ''
+			})
+			.end((err, res) => {
+				expect(res).to.have.status(400);
+				expect(res.status).to.be.eql(400);
+				done();
+			});
+	});
+});
+describe('validate users profile', () => {
+	it('should return 400 if all fields are not provided', (done) => {
+		chai.request(app)
+			.put('/api/v1/users/UpdateProfile')
+			.set('Authorization', `Bearer ${UserToken}`)
+			.send({
+				firstname: '',
+				lastname: 'john',
+				othername: '',
+				phonenumber: '',
+				username: '@Admin'
+			})
+			.end((err, res) => {
+				expect(res).to.have.status(400);
+				expect(res.status).to.be.eql(400);
+				expect(res.body.message).to.be.eql('all fields required');
+				done();
+			});
+	});
+
+	it('should return 400 if all fields are not string', (done) => {
+		chai.request(app)
+			.put('/api/v1/users/UpdateProfile')
+			.set('Authorization', `Bearer ${UserToken}`)
+			.send({
+				firstname: true,
+				lastname: 'john',
+				othername: 1234,
+				phonenumber: true,
+				username: '@Admin'
+			})
+			.end((err, res) => {
+				expect(res).to.have.status(400);
+				expect(res.status).to.be.eql(400);
+				expect(res.body.message).to.be.eql('all fields must be a string');
 				done();
 			});
 	});

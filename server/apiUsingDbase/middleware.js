@@ -1,40 +1,47 @@
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import validator from 'validator';
+import isInt from 'validator/lib/isInt';
+import isEmail from 'validator/lib/isEmail';
 
-dotenv.config();
 
 export default class ValidateMiddleWare {
 	static validatesignUp(req, res, next) {
 		const {
 			email,
 			password,
-			username
 		} = req.body;
-		if (!email || !password || !username) {
-			return res.status(400).json({
+		if (!email || !password) {
+			return	res.status(400).json({
 				status: 'error',
 				msg: 'all fields required',
+			});
+		}
+		if (email && typeof email !== 'string') {
+			return res.status(400).json({
+				status: 'error',
+				msg: 'email must be a string'
+			});
+		} if (email && !validator.isEmail(email)) {
+			return res.status(400).json({
+				status: 400,
+				messgae: 'the email you entered is not a valid email'
+			});
+		}
+		if (password && typeof password !== 'string') {
+			return	res.status(400).json({
+				status: 'error',
+				msg: 'password must be a string'
+			});
+		} if (password && password.includes(' ')) {
+			return res.status(400).json({
+				status: 'error',
+				msg: 'password should not have a space',
 			});
 		}
 		if (password.length < 6) {
 			return res.status(400).json({
 				status: 'error',
 				msg: 'password length too short',
-			});
-		}
-		return next();
-	}
-
-	//  validate sign in
-	static validateSignIn(req, res, next) {
-		const {
-			email,
-			password
-		} = req.body;
-		if (!email || !password) {
-			return res.status(400).json({
-				status: 'error',
-				msg: 'email and password required'
 			});
 		}
 		return next();
@@ -55,8 +62,6 @@ export default class ValidateMiddleWare {
 				});
 			}
 			req.userId = decoded.id;
-			console.log('>>>>>>>', decoded.id);
-			console.log('>>>>>>', new Date());
 			return next();
 		});
 	}
@@ -68,12 +73,28 @@ export default class ValidateMiddleWare {
 			images,
 			topic,
 			tags,
+			happeningon
 		} = req.body;
 		if (!location
 		|| !images
 		|| !topic
-		|| !tags) {
-			res.json({ msg: 'all fields required' });
+		|| !tags
+		|| !happeningon) {
+			return res.status(400).json({
+				status: 'error',
+				msg: 'all fields required'
+			});
+		}
+		if (location && typeof location !== 'string'
+			|| images && typeof images !== 'string'
+			|| topic && typeof topic !== 'string'
+			|| tags && typeof tags !== 'string'
+			|| happeningon && typeof happeningon !== 'string'
+		) {
+			return 	res.status(400).json({
+				status: 'error',
+				msg: 'all fields must be a string'
+			});
 		}
 		return next();
 	}
@@ -85,7 +106,59 @@ export default class ValidateMiddleWare {
 		} = req.body;
 
 		if (!title || !body) {
-			res.json({ msg: 'all fields required' });
+			return	res.status(400).json({
+				status: 'error',
+				msg: 'all fields required'
+			});
+		}
+		if (title && typeof title !== 'string' || body && typeof body !== 'string') {
+			return	res.json({ msg: 'all fields must be a string' });
+		}
+
+		return next();
+	}
+
+	static validateprofile(req, res, next) {
+		const {
+			firstname,
+			lastname,
+			othername,
+			phonenumber,
+			username
+		} = req.body;
+		if (!firstname || !lastname || !othername || !phonenumber || !username) {
+			return res.status(400).json({
+				status: 400,
+				message: 'all fields required'
+			});
+		}
+		if (firstname || typeof firstname !== 'string'
+		|| lastname || typeof lastname !== 'string'
+		|| othername || typeof othername !== 'string'
+		|| phonenumber || typeof phonenumber !== 'string'
+		|| username || typeof username !== 'string') {
+			return res.status(400).json({
+				status: 400,
+				message: 'all fields must be a string'
+			});
+		}
+		return next();
+	}
+
+	static validateComment(req, res, next) {
+		const { comment } = req.body;
+
+		if (comment && typeof comment !== 'string') {
+			res.status(400).json({
+				status: 400,
+				mesage: 'comment must be string'
+			});
+		} else
+		if (!comment) {
+			res.status(400).json({
+				status: 400,
+				messgae: 'ypu must enter acomment'
+			});
 		}
 		return next();
 	}

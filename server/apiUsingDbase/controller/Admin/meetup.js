@@ -10,33 +10,35 @@ export default class AdminController {
 			tags,
 		} = req.body;
 		const { userId } = req;
-		console.log('>>>>>', userId);
 		const cheCktopic = {
 			text: 'SELECT * FROM meetup WHERE topic = $1 AND userid = $2',
 			values: [topic, userId]
 		};
 		conn.query(cheCktopic).then((result) => {
 			if (result.rowCount !== 0) {
-				res.json({ msg: 'topic already exist, enter another topic' });
+				res.status(409).json({
+					status: 409,
+					msg: 'topic already exist, enter another topic',
+				});
+			} else {
+				const sql = `INSERT INTO meetup (userid,location,images,topic,happeningon,tags) VALUES(${userId}, '${location}', '${images}', '${topic}','${happeningon}', '${tags}') RETURNING  *`;
+				conn.query(sql).then((meetup) => {
+					res.status(201).json({
+						status: 201,
+						message: 'meetup created successfully',
+						meetup: meetup.rows[0]
+					});
+				}).catch(err => console.log(err));
 			}
 		}).catch(err => console.log(err));
-
-		const sql = `INSERT INTO meetup (userid,location,images,topic,happeningon,tags) VALUES(${userId}, '${location}', '${images}', '${topic}','${happeningon}', '${tags}') RETURNING  *`;
-		conn.query(sql).then((meetup) => {
-			res.status(201).json({
-				status: 201,
-				message: 'meetup created successfully',
-				meetup: meetup.rows
-			});
-		}).catch(err => console.log(err));
-	}
+}
 
 	static getAllMeetUp(req, res) {
 		const sql = 'SELECT users.username AS createdBy, meetup.createdon, meetup.location, meetup.images,meetup.topic,meetup.happeningon,meetup.tags FROM users LEFT JOIN meetup ON users.id = userid';
 		conn.query(sql).then((meetup) => {
 			res.status(200).json({
-				status: 200,
-				meetup: meetup.rows
+				status: 'ok',
+				meetup: meetup.rows[0]
 			});
 		}).catch(err => console.log(err));
 	}
@@ -49,12 +51,12 @@ export default class AdminController {
 			if (singleMeetup.rowCount === 0) {
 				res.status(404).json({
 					status: 'error',
-					message: `no user with this id: ${id} `
+					message: `no meetup with this id: ${id} `
 				});
 			} else {
 				res.status(200).json({
 					status: 'ok',
-					data: singleMeetup.rows
+					data: singleMeetup.rows[0]
 				});
 			}
 		});
@@ -73,8 +75,8 @@ export default class AdminController {
 		const values = [id];
 		conn.query(query, values, (err, result) => {
 			if (result.rowCount === 0) {
-				res.status(404).json({
-					status: 'err',
+				return res.status(404).json({
+					status: 'error',
 					message: `no meetup with thais id: ${id}`
 				});
 			}
@@ -91,9 +93,9 @@ export default class AdminController {
 					message: 'please try again'
 				});
 			} else {
-				res.status(201).json({
+			  res.status(200).json({
 					status: 'success',
-					message: 'meetup updated succcessfully',
+					message: 'meetup updated successfully',
 					data: Updatedmeetup.rows[0]
 				});
 			}

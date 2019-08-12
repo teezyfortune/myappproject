@@ -8,8 +8,6 @@ export default class QuestionController {
 		} = req.body;
 		const { userId } = req;
 		const meetupId = parseInt(req.params.id, 10);
-		console.log(meetupId);
-		console.log(userId);
 
 		const checkId = {
 			text: 'SELECT * FROM meetup WHERE  id =$1',
@@ -17,7 +15,7 @@ export default class QuestionController {
 		};
 		conn.query(checkId).then((meetup) => {
 			if (meetup.rowCount === 0) {
-				res.status(404).json({
+				return res.status(404).json({
 					status: 404,
 					message: 'this meetup has been deleted or removed by the moderator',
 				});
@@ -33,22 +31,22 @@ export default class QuestionController {
 					status: 409,
 					message: 'question already asked by another person',
 				});
+			} else {
+				const query = `INSERT INTO question (userid, meetupid, title, body) VALUES('${userId}','${meetupId}','${title}','${body}') RETURNING *`;
+				conn.query(query).then((newQuestion) => {
+					return res.status(201).json({
+						status: 201,
+						question: {
+							id: newQuestion.rows[0].id,
+							userId: newQuestion.rows[0].userId,
+							meetupId: newQuestion.rows[0].meetupId,
+							createdon: newQuestion.rows[0].createdon,
+							title: newQuestion.rows[0].title,
+							body: newQuestion.rows[0].body
+						}
+					});
+				});
 			}
-		});
-
-		const query = `INSERT INTO question (userid, meetupid, title, body) VALUES('${userId}','${meetupId}','${title}','${body}') RETURNING *`;
-		conn.query(query).then((newQuestion) => {
-			res.status(201).json({
-				status: 201,
-				question: {
-					id: newQuestion.rows[0].id,
-					userId: newQuestion.rows[0].userId,
-					meetupId: newQuestion.rows[0].meetupId,
-					createdon: newQuestion.rows[0].createdon,
-					title: newQuestion.rows[0].title,
-					body: newQuestion.rows[0].body
-				}
-			});
 		});
 	}
 }
