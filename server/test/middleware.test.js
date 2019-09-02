@@ -11,16 +11,16 @@ chai.expect();
 
 const Inputs = {
 	email: 'Admin@gmail.com',
-	password: 'Admin123',
+	password: 'Admins123',
 };
-let UserToken;
+let userToken;
 
 before((done) => {
 	chai.request(app)
-		.post('/api/v1/users/login')
+		.post('/api/v1/users/signup')
 		.send(Inputs)
 		.end((err, res) => {
-			UserToken = res.body.token;
+			userToken = res.body.token;
 			done();
 		});
 });
@@ -113,7 +113,7 @@ describe('Meetup validation ', () => {
 	it('should return 400 if all input are empty', (done) => {
 		chai.request(app)
 			.post('/api/v1/users/meetup')
-			.set('Authorization', `Bearer ${UserToken}`)
+			.set('Authorization', `Bearer ${userToken}`)
 			.send({
 				location: '',
 				images: '',
@@ -131,7 +131,7 @@ describe('Meetup validation ', () => {
 	it('should should check if all inputs are string', (done) => {
 		chai.request(app)
 			.post('/api/v1/users/meetup')
-			.set('Authorization', `Bearer ${UserToken}`)
+			.set('Authorization', `Bearer ${userToken}`)
 			.send({
 				location: true,
 				image: '/images/test.jpeg',
@@ -143,7 +143,6 @@ describe('Meetup validation ', () => {
 				expect(res).to.have.status(400);
 				expect(res.body.status).to.be.eql('error');
 				done();
-
 			});
 	});
 });
@@ -151,7 +150,7 @@ describe('question validation', () => {
 	it('should check if all fields are entered', (done) => {
 		chai.request(app)
 			.post('/api/v1/users/meetup/:id/question')
-			.set('Authorizationj', `Bearer ${UserToken}`)
+			.set('Authorization', `Bearer ${userToken}`)
 			.send({
 				title: 'web',
 				body: ''
@@ -160,13 +159,12 @@ describe('question validation', () => {
 				expect(res).to.have.status(400);
 				expect(res.status).to.be.eql(400);
 				done();
-
 			});
 	});
 	it('should check if all fields are string', (done) => {
 		chai.request(app)
 			.post('/api/v1/users/meetup/:id/question')
-			.set('Authorization', `Bearer ${UserToken}`)
+			.set('Authorization', `Bearer ${userToken}`)
 			.send({
 				title: true,
 				body: ''
@@ -182,7 +180,7 @@ describe('validate users profile', () => {
 	it('should return 400 if all fields are not provided', (done) => {
 		chai.request(app)
 			.put('/api/v1/users/UpdateProfile')
-			.set('Authorization', `Bearer ${UserToken}`)
+			.set('Authorization', `Bearer ${userToken}`)
 			.send({
 				firstname: '',
 				lastname: 'john',
@@ -201,7 +199,7 @@ describe('validate users profile', () => {
 	it('should return 400 if all fields are not string', (done) => {
 		chai.request(app)
 			.put('/api/v1/users/UpdateProfile')
-			.set('Authorization', `Bearer ${UserToken}`)
+			.set('Authorization', `Bearer ${userToken}`)
 			.send({
 				firstname: true,
 				lastname: 'john',

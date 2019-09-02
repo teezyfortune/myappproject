@@ -6,7 +6,7 @@ export default class ReactionController {
 		const { userId } = req;
 
 		const confirmLIkes = {
-			text: 'SELECT * FROM questionlikes WHERE questionid = $1 AND userid= $2',
+			text: 'SELECT * FROM questionlikes WHERE questionid = $1 AND userid= $2 AND likes = true',
 			values: [questionId, userId]
 		};
 		conn.query(confirmLIkes, (err, liked) => {
@@ -29,7 +29,7 @@ export default class ReactionController {
 					} else {
 						res.status(201).json({
 							status: 201,
-							messaege: 'questiom liked',
+							messaege: 'question liked',
 							reaction: like.rows[0]
 						});
 					}
@@ -42,7 +42,7 @@ export default class ReactionController {
 		const { userId } = req;
 		const questionId = parseInt(req.params.id, 10);
 		const confirmLIkes = {
-			text: 'SELECT * FROM questionlikes WHERE questionid = $1 AND userid= $2',
+			text: 'SELECT * FROM questionlikes WHERE questionid = $1 AND userid= $2 AND likes = false',
 			values: [questionId, userId]
 		};
 		conn.query(confirmLIkes, (err, liked) => {
@@ -64,9 +64,9 @@ export default class ReactionController {
 							message: 'Oops!! something went wrong'
 						});
 					} else {
-						res.status(201).json({
+						return res.status(201).json({
 							status: 201,
-							messaege: 'questiom liked',
+							message: 'question unliked',
 							reaction: like.rows[0]
 						});
 					}

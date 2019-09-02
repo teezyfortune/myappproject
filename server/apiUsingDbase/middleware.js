@@ -2,7 +2,8 @@ import jwt from 'jsonwebtoken';
 import validator from 'validator';
 import isInt from 'validator/lib/isInt';
 import isEmail from 'validator/lib/isEmail';
-
+import path from 'path';
+import multer from 'multer';
 
 export default class ValidateMiddleWare {
 	static validatesignUp(req, res, next) {
@@ -132,11 +133,11 @@ export default class ValidateMiddleWare {
 				message: 'all fields required'
 			});
 		}
-		if (firstname || typeof firstname !== 'string'
-		|| lastname || typeof lastname !== 'string'
-		|| othername || typeof othername !== 'string'
-		|| phonenumber || typeof phonenumber !== 'string'
-		|| username || typeof username !== 'string') {
+		if (firstname && typeof firstname !== 'string'
+		|| lastname && typeof lastname !== 'string'
+		|| othername && typeof othername !== 'string'
+		|| phonenumber && typeof phonenumber !== 'string'
+		|| username && typeof username !== 'string') {
 			return res.status(400).json({
 				status: 400,
 				message: 'all fields must be a string'
@@ -158,6 +159,24 @@ export default class ValidateMiddleWare {
 			res.status(400).json({
 				status: 400,
 				messgae: 'ypu must enter acomment'
+			});
+		}
+		return next();
+	}
+
+	static validateRSVP(req, res, next) {
+		const { response } = req.body;
+
+		if (response && typeof response !== 'string') {
+			return res.status(400).json({
+				status: 400,
+				message: 'response must be a string'
+			});
+		}
+		if (!response) {
+			return res.status(400).json({
+				status: 400,
+				message: 'field required'
 			});
 		}
 		return next();

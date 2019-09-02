@@ -16,6 +16,7 @@
     "flash": "^1.1.0",
     "jsonwebtoken": "^8.5.1",
     "logger": "0.0.1",
+    "multer": "^1.4.2",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",

@@ -6,18 +6,22 @@ import app from '../../index';
 const { expect } = chai;
 chai.use(chaiHttp);
 
-const AnotherUser = {
-	email: 'usermain@gmail.com',
-	password: 'main123',
+const mainUser = {
+	email: 'testing@gmail.com',
+	password: 'test123'
 };
-let AnotherUserToken;
+
+let anotherUserToken;
+
+let faketoken;
+
 
 before((done) => {
 	chai.request(app)
 		.post('/api/v1/users/login')
-		.send(AnotherUser)
+		.send(mainUser)
 		.end((err, res) => {
-			AnotherUserToken = res.body.token;
+			anotherUserToken = res.body.token;
 			done();
 		});
 });
@@ -27,13 +31,13 @@ const sampleMeetup = {
 	topic: 'Why React Js',
 	happeningon: '16 aug 2019, 10:00:am',
 	tags: 'UI technology',
-
 };
+
 describe('meetup controller test', () => {
 	it('should create new meeetup', (done) => {
 		chai.request(app)
 			.post('/api/v1/users/meetup')
-			.set('Authorization', `Bearer ${AnotherUserToken}`)
+			.set('Authorization', `Bearer ${anotherUserToken}`)
 			.send(sampleMeetup)
 			.end((err, res) => {
 				expect(res).to.have.status(201);
@@ -41,25 +45,26 @@ describe('meetup controller test', () => {
 				expect(res.body.message).to.be.eql('meetup created successfully');
 				expect(res.body.meetup).to.be.an('object');
 				done();
+				console.log('>>>', res);
 			});
 	});
 	it('return 409 if meetup already exist', (done) => {
 		chai.request(app)
 			.post('/api/v1/users/meetup')
-			.set('Authorization', `Bearer ${AnotherUserToken}`)
+			.set('Authorization', `Bearer ${anotherUserToken}`)
 			.send(sampleMeetup)
 			.end((err, res) => {
+				console.log('>>>', res);
 				expect(res).to.have.status(409);
 				expect(res.body.status).to.be.eql(409);
 				expect(res.body.msg).to.be.eql('topic already exist, enter another topic');
 				done();
 			});
 	});
-	it('get all users', (done) => {
+	it('get all meetup', (done) => {
 		chai.request(app)
 			.get('/api/v1/users/meetup')
-			.set('Authorization', `Bearer ${AnotherUserToken}`)
-			.send(sampleMeetup)
+			.set('Authorization', `Bearer ${anotherUserToken}`)
 			.end((err, res) => {
 				expect(res).to.have.status(200);
 				expect(res.body.status).to.be.eql('ok');
@@ -67,11 +72,10 @@ describe('meetup controller test', () => {
 				done();
 			});
 	});
-	it('get a single users', (done) => {
+	it('get a single meetup', (done) => {
 		chai.request(app)
-			.get('/api/v1/users/meetup/5')
-			.set('Authorization', `Bearer ${AnotherUserToken}`)
-			.send(sampleMeetup)
+			.get('/api/v1/users/meetup/31')
+			.set('Authorization', `Bearer ${anotherUserToken}`)
 			.end((err, res) => {
 				expect(res).to.have.status(200);
 				expect(res.body.status).to.be.eql('ok');
@@ -82,9 +86,8 @@ describe('meetup controller test', () => {
 
 	it('return 404 if no meetup found', (done) => {
 		chai.request(app)
-			.get('/api/v1/users/meetup/89')
-			.set('Authorization', `Bearer ${AnotherUserToken}`)
-			.send(sampleMeetup)
+			.get('/api/v1/users/meetup/200')
+			.set('Authorization', `Bearer ${faketoken}`)
 			.end((err, res) => {
 				expect(res).to.have.status(404);
 				expect(res.body.status).to.be.eql('error');
@@ -104,8 +107,8 @@ const updatSampleMeetup = {
 describe('Updates a meetUp', () => {
 	it('should update a target meetup with the specified id', (done) => {
 		chai.request(app)
-			.put('/api/v1/users/meetup/7')
-			.set('Authorization', `Bearer ${AnotherUserToken}`)
+			.put('/api/v1/users/meetup/31')
+			.set('Authorization', `Bearer ${anotherUserToken}`)
 			.send(updatSampleMeetup)
 			.end((err, res) => {
 				expect(res).to.have.status(200);
@@ -113,10 +116,35 @@ describe('Updates a meetUp', () => {
 				done();
 			});
 	});
-	it('shuld return 404 if id found', (done) => {
+	it('should return 404 if id not found', (done) => {
 		chai.request(app)
 			.put('/api/v1/users/meetup/99')
-			.set('Authorization', `Bearer ${AnotherUserToken}`)
+			.set('Authorization', `Bearer ${anotherUserToken}`)
+			.send(updatSampleMeetup)
+			.end((err, res) => {
+				expect(res).to.have.status(404);
+				expect(res.body.status).to.be.eql('error');
+				done();
+			});
+	});
+});
+
+describe('Delete  a meetUp', () => {
+	it('should delete a meetup with a specific id', (done) => {
+		chai.request(app)
+			.delete('/api/v1/users/meetup/120')
+			.set('Authorization', `Bearer ${anotherUserToken}`)
+			.send(updatSampleMeetup)
+			.end((err, res) => {
+				expect(res).to.have.status(200);
+				expect(res.body.status).to.be.eql('success');
+				done();
+			});
+	});
+	it('should return 404 if id not found', (done) => {
+		chai.request(app)
+			.delete('/api/v1/users/meetup/99')
+			.set('Authorization', `Bearer ${anotherUserToken}`)
 			.send(updatSampleMeetup)
 			.end((err, res) => {
 				expect(res).to.have.status(404);

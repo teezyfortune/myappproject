@@ -75,47 +75,36 @@ export default class UserController {
 		});
 	}
 
-	static Userprofile(req, res) {
+	static userProfile(req, res) {
 		const { userId } = req;
 		const checkMatch = {
 			text: 'SELECT * FROM users WHERE id = $1',
-			value: [userId]
+			values: [userId]
 		};
-		conn.query(checkMatch, (err, proFiileInfo) => {
-			if (err) {
-				res.status(400).json({
-					status: 400,
-					message: 'Oops! somethiong went wrong'
+		conn.query(checkMatch, (err, profileInfo) => {
+			if (profileInfo.rowCount === 0) {
+				res.status(404).json({
+					status: 404,
+					message: 'you are not loggedIn'
 				});
 			} else {
 				res.status(200).json({
 					status: 200,
-					proFiile: {
-						firstname: proFiileInfo.rows[0].firstname,
-						lastname: proFiileInfo.rows[0].lastname,
-						othername: proFiileInfo.rows[0].othername,
-						email: proFiileInfo.rows[0].email,
-						phonenumber: proFiileInfo.rows[0].phonenumber
+					profile: {
+						firstname: profileInfo.rows[0].firstname,
+						lastname: profileInfo.rows[0].lastname,
+						othername: profileInfo.rows[0].othername,
+						email: profileInfo.rows[0].email,
+						phonenumber: profileInfo.rows[0].phonenumber,
+						username: profileInfo.rows[0].username
+
 					}
 				});
 			}
 		});
 	}
 
-	static UpdateProfile(req, res, next) {
-		const { userId } = req;
-		const checkExist = {
-			text: ' SELECT * FROM users WHERE id =$1',
-			values: [userId],
-		};
-		conn.query(checkExist, (err, exist) => {
-			if (exist.rowCount === 0) {
-				res.status(404).json({
-					status: 404,
-					message: `no user withe id: ${userId}`
-				});
-			}
-		});
+	static updateProfile(req, res) {
 		const {
 			firstname,
 			lastname,
@@ -123,13 +112,28 @@ export default class UserController {
 			phonenumber,
 			username
 		} = req.body;
+		const { userId } = req;
+		const checkExist = {
+			text: ' SELECT * FROM users WHERE id =$1',
+			values: [userId],
+		};
+		conn.query(checkExist, (err, exist) => {
+			if (exist.rowCount === 0) {
+				return res.status(404).json({
+					status: 404,
+					message: `no user with id: ${userId}`
+				});
+			}
+		});
+
 		const UpdateSql = {
 			name: 'profileUpdate',
-			text: 'UPDATE users SET firstname = $1, lastname = $2, othername =$3, phonenumber=$4  WHERE id =$5 RETURNING *',
+			text: 'UPDATE users SET firstname = $1, lastname = $2, othername =$3, phonenumber=$4 , username =$5 WHERE id =$6 RETURNING *',
 			values: [firstname.trim().toLowerCase(), lastname.trim().toLowerCase(), othername.trim().toLowerCase(), phonenumber.trim().toLowerCase(), username.trim().toLowerCase(), userId]
 		};
 		conn.query(UpdateSql, (err, Updatedprofile) => {
 			if (err) {
+				console.log(err);
 				res.status(400).json({
 					status: 400,
 					message: 'Oops! something went wrong'
@@ -137,7 +141,7 @@ export default class UserController {
 			} else {
 				res.status(200).json({
 					status: 200,
-					proFileInfo: {
+					profileInfo: {
 						firstname: Updatedprofile.rows[0].firstname,
 						lastname: Updatedprofile.rows[0].lastname,
 						othername: Updatedprofile.rows[0].othername,
@@ -147,6 +151,5 @@ export default class UserController {
 				});
 			}
 		});
-		return next();
 	}
 }
